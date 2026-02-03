@@ -1,0 +1,21 @@
+[package]
+name = "yt-transcriber"
+version = "1.0.0"
+edition = "2021"
+description = "CLI tool to extract YouTube video transcripts with timestamps"
+license = "MIT"
+repository = "https://github.com/XMA-Faez/yt-transcriber"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+chrono = "0.4"
+url = "2"
+tempfile = "3"
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"

@@ -4,14 +4,34 @@ A CLI tool for extracting YouTube video transcripts with timestamps in multiple 
 
 ## Installation
 
+### From source (requires Rust)
+
 ```bash
-bun install
+git clone https://github.com/XMA-Faez/yt-transcriber.git
+cd yt-transcriber
+cargo build --release
+sudo cp target/release/yt-transcriber /usr/local/bin/
 ```
+
+### One-liner install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/XMA-Faez/yt-transcriber/main/install.sh | bash
+```
+
+## Requirements
+
+- **yt-dlp**: The tool will attempt to install it automatically if not found, or you can install manually:
+  ```bash
+  pip install yt-dlp
+  # or
+  brew install yt-dlp
+  ```
 
 ## Usage
 
 ```bash
-bun run src/index.ts <url> [options]
+yt-transcriber <url> [options]
 ```
 
 ### Arguments
@@ -24,29 +44,29 @@ bun run src/index.ts <url> [options]
 |--------|-------|-------------|---------|
 | `--format` | `-f` | Output format: txt, srt, json | txt |
 | `--output` | `-o` | Output file path | stdout |
-| `--language` | `-l` | Language code for transcript | auto |
+| `--language` | `-l` | Language code for transcript | en |
 | `--no-timestamps` | | Exclude timestamps from TXT output | false |
 
 ### Examples
 
 ```bash
 # Basic text output to stdout
-bun run src/index.ts dQw4w9WgXcQ
+yt-transcriber dQw4w9WgXcQ
 
 # Full URL
-bun run src/index.ts "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+yt-transcriber 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 
 # SRT subtitle format to file
-bun run src/index.ts dQw4w9WgXcQ -f srt -o subtitles.srt
+yt-transcriber dQw4w9WgXcQ -f srt -o subtitles.srt
 
 # JSON output
-bun run src/index.ts dQw4w9WgXcQ --format json --output transcript.json
+yt-transcriber dQw4w9WgXcQ --format json --output transcript.json
 
 # Spanish transcript
-bun run src/index.ts dQw4w9WgXcQ -l es
+yt-transcriber dQw4w9WgXcQ -l es
 
 # Text without timestamps
-bun run src/index.ts dQw4w9WgXcQ --no-timestamps
+yt-transcriber dQw4w9WgXcQ --no-timestamps
 ```
 
 ## Output Formats
@@ -74,58 +94,47 @@ Today we're going to talk about...
 
 ```json
 {
-  "videoId": "VIDEO_ID",
-  "language": "auto",
+  "video_id": "VIDEO_ID",
+  "language": "en",
   "segments": [
     {
       "index": 0,
       "text": "Hello and welcome",
-      "startSeconds": 1.0,
-      "endSeconds": 4.5,
-      "durationSeconds": 3.5
+      "start_seconds": 1.0,
+      "end_seconds": 4.5,
+      "duration_seconds": 3.5
     }
   ],
   "metadata": {
-    "totalSegments": 1,
-    "extractedAt": "2026-02-03T12:00:00Z"
+    "total_segments": 1,
+    "extracted_at": "2026-02-03T12:00:00Z"
   }
 }
 ```
+
+## Supported URL Formats
+
+- `dQw4w9WgXcQ` (video ID only)
+- `https://youtube.com/watch?v=dQw4w9WgXcQ`
+- `https://www.youtube.com/watch?v=dQw4w9WgXcQ`
+- `https://m.youtube.com/watch?v=dQw4w9WgXcQ`
+- `https://youtu.be/dQw4w9WgXcQ`
+- `https://youtube.com/shorts/dQw4w9WgXcQ`
+- `https://youtube.com/live/dQw4w9WgXcQ`
+- `https://youtube.com/embed/dQw4w9WgXcQ`
+- `https://music.youtube.com/watch?v=dQw4w9WgXcQ`
 
 ## Exit Codes
 
 | Code | Meaning |
 |------|---------|
 | 0 | Success |
-| 1 | Invalid arguments |
+| 1 | Invalid arguments or yt-dlp not available |
 | 2 | Video/transcript unavailable |
 | 3 | Network error |
 | 4 | File write error |
 
 ## Tech Stack
 
-- **Runtime**: Bun
-- **Language**: TypeScript
-- **CLI Framework**: citty
-- **Transcript Extraction**: youtube-transcript-plus
-
-## Project Structure
-
-```
-src/
-├── index.ts              # CLI entry point
-├── commands/
-│   └── extract.ts        # Main extract command
-├── extractors/
-│   └── youtube.ts        # YouTube transcript fetching
-├── formatters/
-│   ├── index.ts          # Formatter factory
-│   ├── txt.ts            # Plain text formatter
-│   ├── srt.ts            # SRT subtitle formatter
-│   └── json.ts           # JSON formatter
-├── utils/
-│   ├── url-parser.ts     # YouTube URL/ID parsing
-│   └── time.ts           # Timestamp formatting
-└── types/
-    └── index.ts          # TypeScript interfaces
-```
+- **Language**: Rust
+- **Subtitle Extraction**: yt-dlp (external dependency)
